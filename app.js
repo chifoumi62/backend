@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const userSchema = require('./models/user');
 const userRoute = require('./routes/userRoute');
 const bookRoute = require('./routes/bookRoute');
-const multer = require('multer');
-const upload = multer();
+const path = require('path');
+
 
 
 
@@ -26,8 +26,6 @@ async function run() {
 }
 run();
 
-    
- app.use(express.urlencoded({extended:true}));
  app.use(express.json()) ;// For parsing multipart/form-data, which is used for file uploads
 
 
@@ -41,5 +39,6 @@ app.use((req, res, next) => {
 
 app.use('/api/books', bookRoute);
 app.use('/api/auth', userRoute);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;
