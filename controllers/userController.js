@@ -20,12 +20,12 @@ exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
     .then(user => {
       if (!user) {
-        return res.status(401).json({ error: 'User not found!' });
+        return res.status(401).json({ error: 'email/password incorrect' });
       }
       bcrypt.compare(req.body.password, user.password)
         .then(valid => {
           if (!valid) {
-            return res.status(401).json({ error: 'Incorrect password!' });
+            return res.status(401).json({ error: 'email/password incorrect' });
           }
           const token = jwt.sign(
             { userId: user._id },

@@ -1,7 +1,7 @@
 const Book = require('../models/book');
 
 exports.createbooks=(req, res, next) => {
-delete req.body.userId; 
+delete req.body._Id;
   const book = new Book({
     ...req.body,
   });
