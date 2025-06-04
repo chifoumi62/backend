@@ -4,13 +4,14 @@ const userSchema = require('./models/user');
 const userRoute = require('./routes/userRoute');
 const bookRoute = require('./routes/bookRoute');
 const path = require('path');
+require('dotenv').config();
 
 
 
 
 const app = express();
 
-const uri = "mongodb+srv://chifoumi62:Casino73@cluster0.rcxl16h.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = "mongodb+srv://"+process.env.DB_USER+":"+process.env.DB_PASSWORD+"@"+process.env.DB_CLUSTER+"/?retryWrites=true&w=majority&appName=Cluster0";
 
 const clientOptions = { serverApi: { version: '1', strict: true, deprecationErrors: true } };
 
