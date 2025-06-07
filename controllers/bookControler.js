@@ -1,7 +1,19 @@
 const Book = require('../models/book');
 const fs = require('fs');
+const sharp = require('sharp');
 
 exports.createbooks=(req, res, next) => {
+    fs.access('images',(error) => {
+        if (error) {
+            fs.mkdirSync('images');
+        }
+    });
+    const {buffer, originalname} = req.file;
+    const timestamp = new Date().toDateString();
+    const filename = `${timestamp}-${originalname}.webp`;
+    sharp(buffer)
+        .webp({ quality: 50 })
+        .toFile(`images/${filename}`) 
 const bookObject = JSON.parse(req.body.book);
   delete bookObject._id;
     delete bookObject._userId;
@@ -129,7 +141,6 @@ exports.deleteBooks = (req, res, next) => {
 
 exports.noteBooks = async (req, res, next) => {
 
- 
 const {rating} = req.body;
 if (!rating || typeof rating !== 'number' || rating < 0 || rating > 5) {
     return res.status(400).json({ error: 'Invalid rating. It must be a number between 0 and 5.' });
