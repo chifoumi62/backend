@@ -3,23 +3,13 @@ const fs = require('fs');
 const sharp = require('sharp');
 
 exports.createbooks=(req, res, next) => {
-    fs.access('images',(error) => {
-        if (error) {
-            fs.mkdirSync('images');
-        }
-    });
-    const {buffer, originalname} = req.file;
-    const timestamp = new Date().toDateString();
-    const filename = `${timestamp}-${originalname}.webp`;
-    sharp(buffer)
-        .webp({ quality: 50 })
-        .toFile(`images/${filename}`) 
+   
 const bookObject = JSON.parse(req.body.book);
   delete bookObject._id;
     delete bookObject._userId;
   const book = new Book({
     ...bookObject,
-    imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
+    imageUrl: `${req.protocol}://${req.get('host')}/images/resized_${req.file.filename}`,
     userId: req.auth.userId
   });
   book.save().then(
@@ -70,7 +60,7 @@ exports.getAllBooks = (req,res,next) => {
 exports.modifyBooks =  (req, res, next) => {
     const bookObject = req.file ? {
         ...JSON.parse(req.body.book),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        imageUrl: `${req.protocol}://${req.get('host')}/images/resized_${req.file.filename}`
     } : { ...req.body };
     delete bookObject._userId;
     Book.findOne({ _id: req.params.id }).then(
