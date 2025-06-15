@@ -1,6 +1,8 @@
 const Book = require('../models/book');
 const fs = require('fs');
+const path = require('path');
 const sharp = require('sharp');
+const user = require('../models/user');
 
 exports.createbooks=(req, res, next) => {
    
@@ -69,7 +71,26 @@ exports.modifyBooks =  (req, res, next) => {
             return res.status(401).json({
             message: 'Non autorisé !'
             });
-        }else {
+        }
+        if (req.file) {
+            const filename = book.imageUrl.split('/images/')[1];
+            fs.unlink(`images/${filename}`, () => {
+            Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id }).then(
+                () => {
+                res.status(200).json({
+                    message: 'Objet modifié !'
+                });
+                }
+            ).catch(
+                (error) => {
+                res.status(401).json({
+                    error: error
+                });
+                }
+            );  
+            }
+            ); 
+      } else {
         Book.updateOne({ _id: req.params.id }, { ...bookObject, _id: req.params.id }).then(
             () => {
             res.status(200).json({
@@ -83,9 +104,9 @@ exports.modifyBooks =  (req, res, next) => {
             });
             }
         );
-        }
+      }
     }
-    ).catch(
+    ).catch( 
         (error) => {
         res.status(400).json({
             error: error
@@ -93,6 +114,10 @@ exports.modifyBooks =  (req, res, next) => {
         }
     );
 };
+
+
+        
+       
 
 exports.deleteBooks = (req, res, next) => {
     Book.findOne({ _id: req.params.id }).then(
@@ -148,7 +173,7 @@ try {
     }
 
     // Add the new rating
-    book.ratings.push({ userId: req.auth.userId, grade: rating });
+    book.ratings.push({ userId: req.auth.userId, grade: rating, });
     
     // Calculate the new average rating
     const totalRatings = book.ratings.reduce((sum, r) => sum + r.grade, 0);
@@ -158,7 +183,9 @@ try {
     
     res.status(200).json({
         message: 'Rating added successfully',
-        averageRating: book.averageRating
+        ...book.toObject(),
+        averageRating: book.averageRating,
+         
     });
 } catch (error) {
     console.error('Error adding rating:', error);
